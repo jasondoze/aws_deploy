@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Set the keys
-aws_access_key_id = YOUR_ACCESS_KEY
-aws_secret_access_key = YOUR_SECRET_KEY
+export aws_access_key_id = YOUR_ACCESS_KEY
+export aws_secret_access_key = YOUR_SECRET_KEY
 
 # Set the region
 region=us-east-1
