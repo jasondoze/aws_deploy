@@ -1,60 +1,42 @@
-# AWS_Deploy
-
-## Mac OS only
-
-<br>
-# Overview
-
-## This script is for deploying infrascructure in amazon.
----
-
-### This script installs and configures the brew, awscli, and jq command-line utilities if they are not already installed on the system.
-
-
-### Next, it prompts the user to configure their AWS credentials using the aws configure command.
+## These scripts, specifically for Mac OS users, provide automation to deploy and destroy infrastructure within the Amazon Web Services platform using the AWS CLI.
 
 <br>
 
-### Then, it sets the Amazon Machine Image (AMI) used to create the EC2 instance, and checks if a security group with the specified name exists. If it does not exist, the script creates the security group and adds ingress and egress rules to it.
+# Deploy
+
+1. The script first ensures that necessary utilities, such as brew and the AWS command line interface, are installed on the system.
+
+2. It then proceeds to verify the presence of an RSA key pair, creating one if necessary and securely storing it locally as aws_rsa_key_pair.pem.
+
+3. It subsequently checks for the existence of a specified security group, creating one and configuring ingress rules if it does not exist.
+
+4. The script then checks for the presence of an EC2 instance matching specified parameters, such as AMI ID, instance type, and security group ID, creating one if necessary and informing the user if it already exists.
+
+5. Finally, the script waits for the instance to become active before providing SSH access to it.
 
 <br>
 
-### Next, the script checks if an EC2 instance with the specified AMI ID, instance type, and security group ID already exists. If it does not exist, the script creates the EC2 instance. If it does exist, the script prints a message indicating that the instance already exists.
+### Run this command in the terminal replacing XXX with your AWS access keys.
+ 
+<br>
+
+`export AWS_ACCESS_KEY_ID=XXX AWS_SECRET_ACCESS_KEY=XXX AWS_DEFAULT_REGION=XXX; bash aws_deploy.sh`   
 
 <br>
 
-### Finally, the script prints the public IP address of the EC2 instance.
+# Destroy 
+
+### This script is used to remove any trace of an AWS EC2 instance deployment from your local machine. It performs the following actions:
+
+1. Deletes the IP fingerprints of the AWS instances from the known_hosts file, which is used to store information about SSH connections.
+2. Terminates the EC2 instances that were created as part of the deployment.
+3. Deletes the AWS key pairs and RSA key pairs used to connect to the instances.
+4. Removes any security groups that were created during the deployment.
+5. This script ensures that all resources created during the deployment are cleaned up, and that any information about the instances is removed from your local machine.
 
 <br>
 
-### Run this command in the terminal after replacing XXX with your keys.
----
-
-`export AWS_ACCESS_KEY_ID=XXX AWS_SECRET_ACCESS_KEY=XXX AWS_DEFAULT_REGION=XXX; bash aws.sh`   
-
+To destroy, run the following command: 
 <br>
 
-### Run this command to terminate the instance
-
-`aws ec2 terminate-instances --instance-ids i-0c7a8fbcd9463a3eb`
-
-
-<br>
-
-# Amazon secret store, put this pem key in there
-
-```
-aws get-secret-value --secret-id secret_rsa_id
-aws create-secret --name secret_rsa_id --secret-string ./aws_rsa_key_pair.pem --description "SSH for aws log in"
-```
-
-<br>
-
-```
-{
-  key: "private key is stored in AWS secretsmanager",
-  
-  test: "aws secretsmanager get-secret-value --secret-id ${AWS_VM}",
-  action: "aws secretsmanager create-secret --name ${AWS_VM} --secret-string file://${AWS_VM}.pem --description \"SSH private key for ${AWS_VM}\""
-},
-```
+`bash destroy_aws.sh`
