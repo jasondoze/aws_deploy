@@ -1,5 +1,5 @@
 Create key-pair
-aws ec2 create-key-pair --key-name aws_rsa_key_pair --query 'KeyMaterial' --output text > aws_rsa_key_pair.pem && chmod 0600 aws_rsa_key_pair.pem 
+aws ec2 create-key-pair --key-name aws_rsa_key --query 'KeyMaterial' --output text > aws_rsa_key_pair.pem && chmod 0600 aws_rsa_key_pair.pem 
 
 Create instance
 aws ec2 run-instances --image-id ami-06878d265978313ca --instance-type t2.micro --security-group-ids $(aws ec2 describe-security-groups --group-names ssh_http --region $AWS_DEFAULT_REGION --query 'SecurityGroups[*].[GroupId]' --output text) --count 1 --region $AWS_DEFAULT_REGION --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value="aws-instance-01"}]' --key-name aws_rsa_key_pair
@@ -20,4 +20,16 @@ ssh -i ./aws_rsa_key_pair.pem ubuntu@$(aws ec2 describe-instances --filter Name=
 
 Secrets manager
 aws secretsmanager get-secret-value --secret-id secret_rsa_id
-aws secretsmanager create-secret --name secret_rsa_id --secret-string ./aws_rsa_key_pair.pem --description "SSH for aws log in"
+aws secretsmanager create-secret --name secret_rsa_id --secret-string ./aws_rsa_key_pair.pem --description "SSH for aws log in"`
+
+AWS IAM authentication login
+aws sso login --profile default
+
+AWS IAM authentication logout
+aws sso logout --profile default && aws configure list
+
+Retrieve account ID
+aws sts get-caller-identity
+
+Account ID and aliases
+aws iam list-account-aliases

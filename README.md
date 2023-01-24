@@ -16,13 +16,47 @@
 
 <br>
 
-### Run this command in the terminal replacing XXX with your AWS access keys.
- 
+### Setting up AWS Identity Center for CLI Credentials
+* To ensure secure and efficient access to AWS resources, we have implemented the new AWS Identity Center for AWS CLI credentials. 
+* To get started, the user must set up the Identity Center within the AWS Console by following the instructions provided in the link: https://docs.aws.amazon.com/singlesignon/latest/userguide/getting-started.html
+* Once the setup is complete, the user needs to run the following command to configure the local credentials: 
+```awscli
+  aws configure sso
+```
 <br>
 
-`export AWS_ACCESS_KEY_ID=XXX AWS_SECRET_ACCESS_KEY=XXX AWS_DEFAULT_REGION=XXX; bash aws_deploy.sh`   
+### To ensure proper authentication with the AWS SSO profile, run the following command to log in to the SSO portal and obtain temporary credentials:
+
+```awscli
+aws sso login --profile default
+```
+
+
+* This command will prompt you to open a URL in your browser, where you can enter your SSO credentials and log in. 
+* Once you have successfully logged in, the command will return temporary credentials that can be used to access your AWS resources via the SSO profile.
 
 <br>
+
+## AWS SSO authentication
+---
+To authenticate your session and obtain temporary credentials for the SSO profile, you can use the following command:
+```awscli
+aws sso login --profile default
+```
+
+## To log out of your SSO session, use the following command:
+```awscli
+aws sso logout --profile default && aws configure list
+```
+* It will also give you a list of all the profiles in your AWS config.
+
+<br>
+
+### This command will execute the script deploy_aws.sh, which will create a virtual machine (VM) on AWS and allow you to connect to it via SSH
+
+```shell
+bash deploy_aws.sh
+```
 
 # Destroy 
 
@@ -37,6 +71,5 @@
 <br>
 
 To destroy, run the following command: 
-<br>
 
 `bash destroy_aws.sh`
