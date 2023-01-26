@@ -16,11 +16,27 @@ if ( which aws > /dev/null )
 then
   echo -e "\n==== Awscli currently installed ====\n"
 else 
+  echo -e "\n==== Installing awscli ====\n"
   brew install awscli
-  echo "\n==== Installed awscli ====\n"
 fi
 
-# aws configure get cli_pager=less
+#
+if ( aws sts get-caller-identity ) 
+then
+  echo -e "\n==== SSO authenticated ====\n"
+else 
+  echo -e "\n==== Authenticating SSO ====\n"
+  aws sso login --profile default
+fi
+
+# Install Rsync 
+if ( which rsync > /dev/null ) 
+then
+  echo -e "\n==== Rsync installed ====\n"
+else 
+  echo -e "\n==== Installing Rsync ====\n"
+  brew install rsync
+fi
 
 # Create key pair and store locally 
 if ( aws ec2 describe-key-pairs --profile default --key-name aws_rsa_key )
@@ -58,7 +74,7 @@ if [ $(aws ec2 describe-instances --profile default --filter Name=tag:Name,Value
 then
   echo -e "\n==== EC2 instance present ====\n"
 else
-  aws ec2 run-instances --profile default --image-id ami-06878d265978313ca --instance-type t2.micro --security-group-ids $(aws ec2 describe-security-groups --profile default --group-name ssh_http --query 'SecurityGroups[*].[GroupId]' --output text) --count 1 --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value="aws-instance-01"}]' --key-name   --associate-public-ip-address
+  aws ec2 run-instances --profile default --image-id ami-06878d265978313ca --instance-type t2.micro --security-group-ids $(aws ec2 describe-security-groups --profile default --group-name ssh_http --query 'SecurityGroups[*].[GroupId]' --output text) --count 1 --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value="aws-instance-01"}]' --key-name aws_rsa_key --associate-public-ip-address
   echo -e "\n==== EC2 instance created ====\n"
 fi
 
@@ -66,9 +82,14 @@ echo -e "\n==== Wait for EC2 instance running ====\n"
 aws ec2 wait instance-running --profile default --instance-ids $(aws ec2 describe-instances --profile default --filter Name=tag:Name,Values="aws-instance-01" 'Name=instance-state-name,Values=[running, stopped, pending]' --query 'Reservations[*].Instances[*].InstanceId' --output text) 
 echo -e "\n==== EC2 instance running ====\n"
 
+# Copy webserver files to production deploy using Rsync
+echo -e "\n==== Transferring files to VM ==== \n"
+rsync -av -e "ssh -o StrictHostKeyChecking=no -i ./aws_rsa_key.pem" --delete --exclude={'.git','.gitignore','aws_rsa_key*','commands.txt','README.md'} webserver.sh ubuntu@$(aws ec2 describe-instances --profile default --filter Name=tag:Name,Values="aws-instance-01" 'Name=instance-state-name,Values=[running, stopped, pending]' --query 'Reservations[*].Instances[*].PublicIpAddress' --output text):/home/ubuntu/
+
+# Use SSH to execute commands on the remote VM
+echo -e "\n==== Executing install script ====\n"
+ssh -o StrictHostKeyChecking=no -i ./aws_rsa_key.pem ubuntu@$(aws ec2 describe-instances --profile default --filter Name=tag:Name,Values="aws-instance-01" 'Name=instance-state-name,Values=[running, stopped, pending]' --query 'Reservations[*].Instances[*].PublicIpAddress' --output text) 'bash webserver.sh'
+
 # Connect to instance via SSH
-sleep 30
 echo -e "\n==== SSH into instance ====\n"
 ssh -o StrictHostKeyChecking=no -i ./aws_rsa_key.pem ubuntu@$(aws ec2 describe-instances --profile default --filter Name=tag:Name,Values="aws-instance-01" 'Name=instance-state-name,Values=[running, stopped, pending]' --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
-
-# aws configure set cli_pager=""

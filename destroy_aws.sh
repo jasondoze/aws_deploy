@@ -44,3 +44,5 @@ then
 else
   echo -e "\n==== No security group present ====\n"
 fi
+
+aws sso logout --profile default && aws configure list
