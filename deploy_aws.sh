@@ -82,13 +82,15 @@ echo -e "\n==== Wait for EC2 instance running ====\n"
 aws ec2 wait instance-running --profile default --instance-ids $(aws ec2 describe-instances --profile default --filter Name=tag:Name,Values="aws-instance-01" 'Name=instance-state-name,Values=[running, stopped, pending]' --query 'Reservations[*].Instances[*].InstanceId' --output text) 
 echo -e "\n==== EC2 instance running ====\n"
 
+<<comment
 # Copy webserver files to production deploy using Rsync
 echo -e "\n==== Transferring files to VM ==== \n"
-rsync -av -e "ssh -o StrictHostKeyChecking=no -i ./aws_rsa_key.pem" --delete --exclude={'.git','.gitignore','aws_rsa_key*','commands.txt','README.md'} webserver.sh ubuntu@$(aws ec2 describe-instances --profile default --filter Name=tag:Name,Values="aws-instance-01" 'Name=instance-state-name,Values=[running, stopped, pending]' --query 'Reservations[*].Instances[*].PublicIpAddress' --output text):/home/ubuntu/
+rsync -av -e "ssh -o StrictHostKeyChecking=no -i ./aws_rsa_key.pem" --delete --exclude={'.git','.gitignore','aws_rsa_key*','commands.txt','README.md'} $(pwd) ubuntu@$(aws ec2 describe-instances --profile default --filter Name=tag:Name,Values="aws-instance-01" 'Name=instance-state-name,Values=[running, stopped, pending]' --query 'Reservations[*].Instances[*].PublicIpAddress' --output text):/home/ubuntu/
 
 # Use SSH to execute commands on the remote VM
 echo -e "\n==== Executing install script ====\n"
 ssh -o StrictHostKeyChecking=no -i ./aws_rsa_key.pem ubuntu@$(aws ec2 describe-instances --profile default --filter Name=tag:Name,Values="aws-instance-01" 'Name=instance-state-name,Values=[running, stopped, pending]' --query 'Reservations[*].Instances[*].PublicIpAddress' --output text) 'bash webserver.sh'
+comment
 
 # Connect to instance via SSH
 echo -e "\n==== SSH into instance ====\n"
