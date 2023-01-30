@@ -33,3 +33,14 @@ aws sts get-caller-identity
 
 Account ID and aliases
 aws iam list-account-aliases
+
+Open Docker locally
+open /Applications/Docker.app 
+
+Build docker image 
+docker build -t doze-nginx .
+
+To run this container in an EC2 instance, use docker run with the -p flag to map the host's port to the container's port
+docker run -p 80:80  -d doze-nginx
+
+
