@@ -39,7 +39,7 @@ aws sso login --profile default
 
 
 ## To log out of your SSO session, use the following command:
-```awscli
+```bash
 aws sso logout --profile default && aws configure list
 ```
 * It will also give you a list of all the profiles in your AWS config.
@@ -48,7 +48,7 @@ aws sso logout --profile default && aws configure list
 
 ### This command will execute the script deploy_aws.sh, which will create a virtual machine (VM) on AWS and allow you to connect to it via SSH
 
-```shell
+```bash
 bash deploy_aws.sh
 ```
 
@@ -65,5 +65,6 @@ bash deploy_aws.sh
 <br>
 
 To destroy, run the following command: 
-
-`bash destroy_aws.sh`
+```bash
+bash destroy_aws.sh
+```
