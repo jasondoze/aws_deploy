@@ -37,12 +37,6 @@ aws sso login --profile default
 
 <br>
 
-## AWS SSO authentication
----
-To authenticate your session and obtain temporary credentials for the SSO profile, you can use the following command:
-```awscli
-aws sso login --profile default
-```
 
 ## To log out of your SSO session, use the following command:
 ```awscli
