@@ -1,8 +1,8 @@
-## These scripts, specifically for Mac OS users, provide automation to deploy and destroy infrastructure within the Amazon Web Services platform using the AWS CLI.
+# These scripts, specifically for Mac OS users, provide automation to deploy and destroy infrastructure within the Amazon Web Services platform using the AWS CLI.
 
 <br>
 
-# Deploy
+## Deploy
 
 1. The script first ensures that necessary utilities, such as brew and the AWS command line interface, are installed on the system.
 
@@ -14,7 +14,6 @@
 
 5. Finally, the script waits for the instance to become active before providing SSH access to it.
 
-<br>
 
 ### Setting up AWS Identity Center for CLI Credentials
 * To ensure secure and efficient access to AWS resources, we have implemented the new AWS Identity Center for AWS CLI credentials. 
@@ -23,7 +22,7 @@
 ```awscli
   aws configure sso
 ```
-<br>
+
 
 ### To ensure proper authentication with the AWS SSO profile, run the following command to log in to the SSO portal and obtain temporary credentials:
 
@@ -38,7 +37,7 @@ aws sso login --profile default
 <br>
 
 
-## To log out of your SSO session, use the following command:
+### To log out of your SSO session, use the following command:
 ```bash
 aws sso logout --profile default && aws configure list
 ```
@@ -52,7 +51,7 @@ aws sso logout --profile default && aws configure list
 bash deploy_aws.sh
 ```
 
-# Destroy 
+## Destroy 
 
 ### This script is used to remove any trace of an AWS EC2 instance deployment from your local machine. It performs the following actions:
 
